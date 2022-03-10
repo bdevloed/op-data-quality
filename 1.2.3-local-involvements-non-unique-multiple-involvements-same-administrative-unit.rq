@@ -38,7 +38,9 @@ SELECT DISTINCT ?bestuur ?label ?typeEredienst ?provincie ?betrokkenheidCount ?l
       ))
          ?betrokkenheid
             org:organization
-              ?bestuur.
+              ?bestuur;
+            a 
+              ere:BetrokkenLokaleBesturen.
           ?lokaalBestuur
             ere:betrokkenBestuur
              ?betrokkenheid.

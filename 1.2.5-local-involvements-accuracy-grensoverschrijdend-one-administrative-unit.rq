@@ -48,7 +48,9 @@ SELECT DISTINCT ?bestuur ?label ?typeEredienst ?provincie ?betrokkenheidCount WH
 
       ?betrokkenheid
         org:organization
-          ?bestuur.
+          ?bestuur;
+        a 
+          ere:BetrokkenLokaleBesturen.
     }
     GROUP BY ?bestuur
     HAVING(COUNT(DISTINCT ?betrokkenheid) = 1)

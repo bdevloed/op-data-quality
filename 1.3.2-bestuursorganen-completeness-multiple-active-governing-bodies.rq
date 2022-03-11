@@ -24,33 +24,34 @@ PREFIX ch: <http://data.lblod.info/vocabularies/contacthub/>
 PREFIX code: <http://lblod.data.gift/vocabularies/organisatie/>
 PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
-SELECT DISTINCT ?bestuur ?label ?typeEredienst ?provincie ?financieringspercentageSum WHERE {
+SELECT DISTINCT ?bestuur ?label ?typeEredienst ?provincie ?bestuursOrgaanCount WHERE {
   {
-    SELECT ?bestuur (SUM(?financieringspercentage) as ?financieringspercentageSum) WHERE {
+    SELECT ?bestuur (COUNT( DISTINCT ?bestuursOrgaan) as ?bestuursOrgaanCount)
+    WHERE {
       ?bestuur
         a
-          ?type.
-
+          ?type;
+        regorg:orgStatus/skos:prefLabel
+          "Actief".
+      {
+          ?bestuur ^besluit:bestuurt ?bestuursOrgaan.
+      }
+      UNION
+      {
+          ?bestuur ^besluit:bestuurt ?parentBestuursOrgaan.
+          ?bestuursOrgaan generiek:isTijdspecialisatieVan ?parentBestuursOrgaan.
+      }
+      ?bestuursOrgaan mandaat:bindingEinde ?einde.
+      FILTER(?einde > now())
       FILTER (?type IN (
         <http://data.lblod.info/vocabularies/erediensten/CentraalBestuurVanDeEredienst>,
         <http://data.lblod.info/vocabularies/erediensten/BestuurVanDeEredienst>
       ))
-      
-      ?betrokkenheid
-        org:organization
-          ?bestuur;
-        ere:financieringspercentage
-          ?financieringspercentage;
-        a 
-          ere:BetrokkenLokaleBesturen;
-        ere:typebetrokkenheid/skos:prefLabel
-          "Toezichthoudend en financierend".
     }
     GROUP BY ?bestuur
-    HAVING(SUM(?financieringspercentage) > 100)
-    ORDER BY DESC(?bestuur)
+    HAVING (COUNT(DISTINCT ?bestuursOrgaan) > 1)
+    ORDER BY ?bestuur
   }
   OPTIONAL {
     ?bestuur
@@ -60,26 +61,47 @@ SELECT DISTINCT ?bestuur ?label ?typeEredienst ?provincie ?financieringspercenta
   OPTIONAL {
   	?bestuur
     	ere:typeEredienst
-     		?typeEredienstUri.
+      		?typeEredienstUri.
     OPTIONAL {
     	?typeEredienstUri
-       	skos:prefLabel
-        	?typeEredienst.
-	  }
+        	skos:prefLabel
+          	?typeEredienst.
+	}
   }
   OPTIONAL {
     ?bestuur
       org:hasPrimarySite
         ?primarySite.
-	  OPTIONAL {    
+    OPTIONAL {    
       ?primarySite
         organisatie:bestaatUit
           ?sa.
-		  OPTIONAL {
-        ?sa
-          locn:adminUnitL2
-            ?provincie.
+		    OPTIONAL {
+          ?sa
+            locn:adminUnitL2
+              ?provincie.
+        }
+		    OPTIONAL {
+          ?sa
+            adres:gemeentenaam
+              ?gemeente.
+        }
+		    OPTIONAL {
+          ?sa
+            locn:postCode
+              ?postalCode.
+        }
+		    OPTIONAL {
+          ?sa
+            locn:thoroughfare
+              ?street.
+        }
+		    OPTIONAL {
+          ?sa
+            adres:Adresvoorstelling.huisnummer
+              ?streetNumber.
         }
       }
     }
-}
+
+} 

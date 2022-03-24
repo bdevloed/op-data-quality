@@ -1,0 +1,32 @@
+# Note : the query is heavy and seems to go through when we run it via virtuoso but not via the SPARQL endpoint
+# Case insentivie & accent tolerant query
+
+PREFIX person: <http://www.w3.org/ns/person#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX org: <http://www.w3.org/ns/org#>
+PREFIX mandaat: <http://data.vlaanderen.be/ns/mandaat#>
+
+SELECT DISTINCT ?person1 ?person2 ?firstName1 ?firstName2 ?lastName1 ?lastName2
+FROM <http://mu.semte.ch/graphs/organisatieportaal>
+WHERE {
+  ?person1 a person:Person ;
+    foaf:givenName ?firstName1 ;
+    foaf:familyName ?lastName1 .
+
+  ?person2 a person:Person ;
+    foaf:givenName ?firstName2 ;
+    foaf:familyName ?lastName2 .
+
+  FILTER (?person1 != ?person2)
+  FILTER (
+    REPLACE(REPLACE(REPLACE(REPLACE(LCASE(?firstName1), "à|â", "a"), "é|è|ê|ë", "e"), "ü|û", "u"), "ç", "c")
+    =
+    REPLACE(REPLACE(REPLACE(REPLACE(LCASE(?firstName2), "à|â", "a"), "é|è|ê|ë", "e"), "ü|û", "u"), "ç", "c")
+  )
+
+  FILTER (
+    REPLACE(REPLACE(REPLACE(REPLACE(LCASE(?lastName1), "à|â", "a"), "é|è|ê|ë", "e"), "ü|û", "u"), "ç", "c")
+    =
+    REPLACE(REPLACE(REPLACE(REPLACE(LCASE(?lastName2), "à|â", "a"), "é|è|ê|ë", "e"), "ü|û", "u"), "ç", "c")
+  )
+}

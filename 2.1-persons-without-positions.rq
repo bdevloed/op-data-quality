@@ -1,0 +1,20 @@
+PREFIX person: <http://www.w3.org/ns/person#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX org: <http://www.w3.org/ns/org#>
+PREFIX mandaat: <http://data.vlaanderen.be/ns/mandaat#>
+
+SELECT DISTINCT ?person ?firstName ?lastName
+FROM <http://mu.semte.ch/graphs/organisatieportaal>
+WHERE {
+  ?person a person:Person ;
+    foaf:givenName ?firstName ;
+    foaf:familyName ?lastName .
+
+  FILTER NOT EXISTS {
+    ?agentInPosition org:heldBy ?person .
+  }
+
+  FILTER NOT EXISTS {
+    ?mandataris mandaat:isBestuurlijkeAliasVan ?person .
+  }
+}

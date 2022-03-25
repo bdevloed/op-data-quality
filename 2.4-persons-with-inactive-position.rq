@@ -1,0 +1,17 @@
+PREFIX person: <http://www.w3.org/ns/person#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX org: <http://www.w3.org/ns/org#>
+PREFIX mandaat: <http://data.vlaanderen.be/ns/mandaat#>
+PREFIX ch: <http://data.lblod.info/vocabularies/contacthub/>
+PREFIX ere: <http://data.lblod.info/vocabularies/erediensten/>
+
+SELECT DISTINCT ?person ?firstName ?lastName ?endPosition
+FROM <http://mu.semte.ch/graphs/organisatieportaal>
+WHERE {
+  ?person a person:Person ;
+    foaf:givenName ?firstName ;
+    foaf:familyName ?lastName .
+
+  ?person (^org:heldBy/ch:eindedatum)|(^mandaat:isBestuurlijkeAliasVan/ere:geplandeEinddatumAanstelling) ?endPosition .
+  FILTER (NOW() > ?endPosition)
+}

@@ -25,7 +25,6 @@ PREFIX code: <http://lblod.data.gift/vocabularies/organisatie/>
 PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
-
 SELECT DISTINCT * WHERE {
   ?bestuur
     a
@@ -66,34 +65,19 @@ SELECT DISTINCT * WHERE {
     <http://data.lblod.info/vocabularies/erediensten/CentraalBestuurVanDeEredienst>,
     <http://data.lblod.info/vocabularies/erediensten/BestuurVanDeEredienst>
   ))
-
-  ?bestuur
-    adms:identifier
-      ?identifier_kbo.
-  ?identifier_kbo
-    skos:notation
-      "KBO nummer".
-  ?identifier_kbo
-    generiek:gestructureerdeIdentificator
-      ?id_structured_kbo.
-  ?id_structured_kbo
-    generiek:lokaleIdentificator
-      ?kbo_nr.
-  ?bestuur2
-    adms:identifier
-      ?identifier_kbo2.
-  ?identifier_kbo2
-    skos:notation
-      "KBO nummer".
-  ?identifier_kbo2
-    generiek:gestructureerdeIdentificator
-      ?id_structured_kbo2.
-  ?id_structured_kbo2
-    generiek:lokaleIdentificator
-      ?kbo_nr2.
-  
-  FILTER (
-    ?kbo_nr = ?kbo_nr2 &&
-    ?bestuur != ?bestuur2
-  )
+  FILTER NOT EXISTS {
+    ?bestuur
+      adms:identifier
+        ?identifier_kbo.
+    ?identifier_kbo
+      skos:notation
+        "KBO nummer".
+    ?identifier_kbo
+      generiek:gestructureerdeIdentificator
+        ?id_structured_kbo.
+    ?id_structured_kbo
+      generiek:lokaleIdentificator
+        ?kbo_nr.
+  	FILTER (strlen(?kbo_nr) = 10)
+  }
 }

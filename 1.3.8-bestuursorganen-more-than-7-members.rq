@@ -49,12 +49,12 @@ WHERE {
     SELECT ?bestuursOrgaan (COUNT(DISTINCT ?member ) AS ?memberCount)
     WHERE {
         ?bestuursOrgaan org:hasPost ?post.
-        ?madataris
+        ?mandataris
           org:holds ?post ;
-          ere:geplandeEinddatumAanstelling ?geplandeEinddatumAanstelling ;
+          mandaat:einde ?einde ;
           mandaat:isBestuurlijkeAliasVan ?member.
 
-          FILTER(?geplandeEinddatumAanstelling > now())
+          FILTER(?einde > now())
     }
     GROUP BY ?bestuursOrgaan
     HAVING (COUNT(DISTINCT ?member) > 6)

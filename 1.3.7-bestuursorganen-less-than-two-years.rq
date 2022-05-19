@@ -1,5 +1,4 @@
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-	
 PREFIX org: <http://www.w3.org/ns/org#>
 PREFIX locn: <http://www.w3.org/ns/locn#>
 PREFIX schema: <http://schema.org/>
@@ -84,14 +83,15 @@ WHERE {
       ?primarySite
         organisatie:bestaatUit
           ?sa.
-		    OPTIONAL {
-          ?sa
-            locn:adminUnitL2
-              ?provincie.
-        }
+	    OPTIONAL {
+        ?sa
+          locn:adminUnitL2
+            ?provincie.
       }
     }
-   FILTER (?type IN (
+  }
+
+  FILTER (?type IN (
     <http://data.lblod.info/vocabularies/erediensten/CentraalBestuurVanDeEredienst>,
     <http://data.lblod.info/vocabularies/erediensten/BestuurVanDeEredienst>
   ))

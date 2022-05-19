@@ -32,18 +32,20 @@ SELECT DISTINCT ?bestuur ?label ?typeEredienst ?provincie ?betrokkenheidCount ?l
       ?bestuur
         a
           ?type.
+
       FILTER (?type IN (
         <http://data.lblod.info/vocabularies/erediensten/CentraalBestuurVanDeEredienst>,
         <http://data.lblod.info/vocabularies/erediensten/BestuurVanDeEredienst>
       ))
-         ?betrokkenheid
-            org:organization
-              ?bestuur;
-            a 
-              ere:BetrokkenLokaleBesturen.
-          ?lokaalBestuur
-            ere:betrokkenBestuur
-             ?betrokkenheid.
+
+      ?betrokkenheid
+         org:organization
+           ?bestuur;
+         a
+           ere:BetrokkenLokaleBesturen.
+       ?lokaalBestuur
+         ere:betrokkenBestuur
+          ?betrokkenheid.
     }
     GROUP BY ?bestuur ?lokaalBestuur
     HAVING(COUNT(DISTINCT ?betrokkenheid) > 1)

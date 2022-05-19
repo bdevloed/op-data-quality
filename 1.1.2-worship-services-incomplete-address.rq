@@ -44,7 +44,7 @@ SELECT DISTINCT * WHERE {
     	?typeEredienstUri
         	skos:prefLabel
           	?typeEredienst.
-	}
+	  }
   }
   OPTIONAL {
     ?bestuur
@@ -54,37 +54,39 @@ SELECT DISTINCT * WHERE {
       ?primarySite
         organisatie:bestaatUit
           ?sa.
-		    OPTIONAL {
-          ?sa
-            locn:adminUnitL2
-              ?provincie.
-        }
-		    OPTIONAL {
-          ?sa
-            adres:gemeentenaam
-              ?gemeente.
-        }
-		    OPTIONAL {
-          ?sa
-            locn:postCode
-              ?postalCode.
-        }
-		    OPTIONAL {
-          ?sa
-            locn:thoroughfare
-              ?street.
-        }
-		    OPTIONAL {
-          ?sa
-            adres:Adresvoorstelling.huisnummer
-              ?streetNumber.
-        }
+	    OPTIONAL {
+        ?sa
+          locn:adminUnitL2
+            ?provincie.
+      }
+	    OPTIONAL {
+        ?sa
+          adres:gemeentenaam
+            ?gemeente.
+      }
+	    OPTIONAL {
+        ?sa
+          locn:postCode
+            ?postalCode.
+      }
+	    OPTIONAL {
+        ?sa
+          locn:thoroughfare
+            ?street.
+      }
+	    OPTIONAL {
+        ?sa
+          adres:Adresvoorstelling.huisnummer
+            ?streetNumber.
       }
     }
-   FILTER (?type IN (
+  }
+
+  FILTER (?type IN (
     <http://data.lblod.info/vocabularies/erediensten/CentraalBestuurVanDeEredienst>,
     <http://data.lblod.info/vocabularies/erediensten/BestuurVanDeEredienst>
   ))
+
   FILTER (
     !BOUND(?provincie) || strlen(?provincie) = 0 ||
     !BOUND(?gemeente) || strlen(?gemeente) = 0 ||

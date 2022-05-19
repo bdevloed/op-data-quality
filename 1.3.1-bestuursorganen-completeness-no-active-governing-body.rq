@@ -93,7 +93,8 @@ SELECT DISTINCT ?bestuur ?label ?typeEredienst ?provincie  WHERE {
         }
       }
     }
-   FILTER (?type IN (
+
+  FILTER (?type IN (
     <http://data.lblod.info/vocabularies/erediensten/CentraalBestuurVanDeEredienst>,
     <http://data.lblod.info/vocabularies/erediensten/BestuurVanDeEredienst>
   ))

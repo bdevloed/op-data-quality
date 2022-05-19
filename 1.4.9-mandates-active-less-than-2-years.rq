@@ -60,10 +60,11 @@ WHERE {
   ?bestuursOrgaan mandaat:bindingEinde ?einde.
   FILTER(?einde > now())
   
-  BIND( 
-    year(?geplandeEinddatumAanstelling) - year(?start) 
-    as ?years
-  )
+  BIND (
+    (xsd:decimal(year(?geplandeEinddatumAanstelling)) + xsd:decimal(month(?geplandeEinddatumAanstelling))/10)
+    -
+    (xsd:decimal(year(?start)) + xsd:decimal(month(?start))/10)
+  as ?years )
   
   FILTER (?years < 2)
 

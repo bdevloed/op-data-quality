@@ -35,29 +35,18 @@ WHERE {
     regorg:orgStatus/skos:prefLabel
       "Actief".
 
-  {
-      ?bestuur ^besluit:bestuurt ?bestuursOrgaan.
-  }
-  UNION
-  {
-      ?bestuur ^besluit:bestuurt ?parentBestuursOrgaan.
-      ?bestuursOrgaan generiek:isTijdspecialisatieVan ?parentBestuursOrgaan.
-  }
+  ?bestuur ^besluit:bestuurt ?parentBestuursOrgaan.
+  ?bestuursOrgaan generiek:isTijdspecialisatieVan ?parentBestuursOrgaan.
 
   ?bestuursOrgaan mandaat:bindingEinde ?einde.
   ?bestuursOrgaan mandaat:bindingStart ?start.
   
-  BIND( 
-    year(?einde) - year(?start) 
-    - if(
-        month(?einde) < month(?start) || 
-        ( 
-          month(?einde) = month(?start) &&
-          day(?einde) < day(?start)
-        )
-      ,1,0 ) 
-    as ?years )
-  
+  BIND (
+    (xsd:decimal(year(?einde)) + xsd:decimal(month(?einde))/10)
+    -
+    (xsd:decimal(year(?start)) + xsd:decimal(month(?start))/10)
+  as ?years )
+
   FILTER (?years < 2)
   
   OPTIONAL {

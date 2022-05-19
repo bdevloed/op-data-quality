@@ -50,13 +50,14 @@ WHERE {
     WHERE {
         ?bestuursOrgaan org:hasPost ?post.
         ?madataris
-          org:holds
-            ?post;
-          mandaat:isBestuurlijkeAliasVan
-            ?member.
+          org:holds ?post ;
+          ere:geplandeEinddatumAanstelling ?geplandeEinddatumAanstelling ;
+          mandaat:isBestuurlijkeAliasVan ?member.
+
+          FILTER(?geplandeEinddatumAanstelling > now())
     }
     GROUP BY ?bestuursOrgaan
-    HAVING (COUNT(DISTINCT ?member) > 7)
+    HAVING (COUNT(DISTINCT ?member) > 6)
     ORDER BY ?bestuursOrgaan
   }
 

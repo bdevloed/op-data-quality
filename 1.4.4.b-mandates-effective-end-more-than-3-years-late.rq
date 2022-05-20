@@ -27,7 +27,7 @@ PREFIX code: <http://lblod.data.gift/vocabularies/organisatie/>
 PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
-SELECT DISTINCT ?bestuur ?label ?typeEredienst ?provincie ?bestuursOrgaan ?parentBestuursOrgaan ?role ?einde ?geplandeEinddatumAanstelling ?years
+SELECT DISTINCT ?bestuur ?label ?typeEredienst ?provincie ?bestuursOrgaan ?parentBestuursOrgaan ?role ?einde ?mandatarisEinde ?years
 FROM <http://mu.semte.ch/graphs/organisatieportaal>
 WHERE {
   ?bestuur
@@ -36,14 +36,8 @@ WHERE {
     regorg:orgStatus/skos:prefLabel
       "Actief".
 
-  {
-      ?bestuur ^besluit:bestuurt ?bestuursOrgaan.
-  }
-  UNION
-  {
-      ?bestuur ^besluit:bestuurt ?parentBestuursOrgaan.
-      ?bestuursOrgaan generiek:isTijdspecialisatieVan ?parentBestuursOrgaan.
-  }
+  ?bestuur ^besluit:bestuurt ?parentBestuursOrgaan.
+  ?bestuursOrgaan generiek:isTijdspecialisatieVan ?parentBestuursOrgaan.
 
   ?bestuursOrgaan
     org:hasPost
@@ -54,19 +48,18 @@ WHERE {
 
   ?mandataris
     	org:holds ?post;
-   		mandaat:einde ?einde;
-      ere:geplandeEinddatumAanstelling ?geplandeEinddatumAanstelling.
+   		mandaat:einde ?mandatarisEinde.
   
   ?bestuursOrgaan mandaat:bindingEinde ?einde.
   FILTER(?einde > now())
   
   BIND( 
-  year(?einde) - year(?geplandeEinddatumAanstelling) 
+  year(?einde) - year(?mandatarisEinde) 
   - if(
-      month(?einde) < month(?geplandeEinddatumAanstelling) || 
+      month(?einde) < month(?mandatarisEinde) || 
       ( 
-        month(?einde) = month(?geplandeEinddatumAanstelling) &&
-        day(?einde) < day(?geplandeEinddatumAanstelling)
+        month(?einde) = month(?mandatarisEinde) &&
+        day(?einde) < day(?mandatarisEinde)
       )
     ,1,0 ) 
   as ?years )

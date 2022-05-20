@@ -51,7 +51,9 @@ WHERE {
       ere:geplandeEinddatumAanstelling ?geplandeEinddatumAanstelling.
   
   ?bestuursOrgaan mandaat:bindingEinde ?einde.
+
   FILTER(?einde > now())
+  FILTER(?geplandeEinddatumAanstelling != "1900-01-01"^^xsd:date)
   
   BIND( 
   year(?einde) - year(?geplandeEinddatumAanstelling) 

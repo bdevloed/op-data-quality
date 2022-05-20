@@ -34,14 +34,8 @@ WHERE {
     a ?type;
     regorg:orgStatus/skos:prefLabel "Actief".
 
-  {
-      ?bestuur ^besluit:bestuurt ?bestuursOrgaan.
-  }
-  UNION
-  {
-      ?bestuur ^besluit:bestuurt ?parentBestuursOrgaan.
-      ?bestuursOrgaan generiek:isTijdspecialisatieVan ?parentBestuursOrgaan.
-  }
+  ?bestuur ^besluit:bestuurt ?parentBestuursOrgaan.
+  ?bestuursOrgaan generiek:isTijdspecialisatieVan ?parentBestuursOrgaan.
 
   ?bestuursOrgaan
     org:hasPost ?post.
@@ -57,8 +51,8 @@ WHERE {
     mandaat:bindingEinde ?einde.
 
   FILTER(?einde > now())
-  
   FILTER (?start > ?startPosition)
+  FILTER(?startPosition != "1900-01-01"^^xsd:date)
 
   OPTIONAL {
     ?bestuur

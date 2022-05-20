@@ -36,14 +36,8 @@ WHERE {
     regorg:orgStatus/skos:prefLabel
       "Actief".
 
-  {
-      ?bestuur ^besluit:bestuurt ?bestuursOrgaan.
-  }
-  UNION
-  {
-      ?bestuur ^besluit:bestuurt ?parentBestuursOrgaan.
-      ?bestuursOrgaan generiek:isTijdspecialisatieVan ?parentBestuursOrgaan.
-  }
+  ?bestuur ^besluit:bestuurt ?parentBestuursOrgaan.
+  ?bestuursOrgaan generiek:isTijdspecialisatieVan ?parentBestuursOrgaan.
 
   ?bestuursOrgaan
     org:hasPost
@@ -56,10 +50,19 @@ WHERE {
     	org:holds ?post;
    		mandaat:start ?start;
       ere:geplandeEinddatumAanstelling ?geplandeEinddatumAanstelling.
-  
+
+  OPTIONAL {
+    ?mandataris mandaat:einde ?mandatarisEinde.
+  }
+
   ?bestuursOrgaan mandaat:bindingEinde ?einde.
+
   FILTER(?einde > now())
-  
+  FILTER(?mandatarisEinde > now())
+
+  FILTER(?start != "1900-01-01"^^xsd:date)
+  FILTER(?mandatarisEinde != "1900-01-01"^^xsd:date)
+
   BIND (
     (xsd:decimal(year(?geplandeEinddatumAanstelling)) + xsd:decimal(month(?geplandeEinddatumAanstelling))/10)
     -

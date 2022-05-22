@@ -56,9 +56,16 @@ WHERE {
       ?role.
   FILTER(?role IN ( "Voorzitter van het centraal bestuur van de eredienst",  "Voorzitter van het bestuur van de eredienst"))
 
+  ?mandataris org:holds ?post .
+
+  OPTIONAL {
+    ?mandataris mandaat:einde ?endPosition .
+  }
+
+  FILTER (!bound(?endPosition) || ?endPosition > NOW())
+
   FILTER EXISTS {
     ?mandataris
-      org:holds ?post;
       mandaat:start "1900-01-01"^^xsd:date .
   }
 

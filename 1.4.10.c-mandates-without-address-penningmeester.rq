@@ -59,6 +59,12 @@ WHERE {
   ?mandataris
     org:holds ?post .
 
+  OPTIONAL {
+    ?mandataris mandaat:einde ?endPosition .
+  }
+
+  FILTER (!bound(?endPosition) || ?endPosition > NOW())
+
   FILTER NOT EXISTS {
     ?mandataris
       schema:contactPoint ?contactPoint.

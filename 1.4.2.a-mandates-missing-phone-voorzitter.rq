@@ -27,7 +27,7 @@ PREFIX code: <http://lblod.data.gift/vocabularies/organisatie/>
 PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
-SELECT DISTINCT ?bestuur ?label ?typeEredienst ?provincie ?bestuursOrgaan ?parentBestuursOrgaan 
+SELECT DISTINCT ?bestuur ?label ?typeEredienst ?provincie ?bestuursOrgaan ?parentBestuursOrgaan ?firstName ?lastName
 FROM <http://mu.semte.ch/graphs/organisatieportaal>
 WHERE {
   ?bestuur
@@ -36,14 +36,8 @@ WHERE {
     regorg:orgStatus/skos:prefLabel
       "Actief".
 
-  {
-      ?bestuur ^besluit:bestuurt ?bestuursOrgaan.
-  }
-  UNION
-  {
-      ?bestuur ^besluit:bestuurt ?parentBestuursOrgaan.
-      ?bestuursOrgaan generiek:isTijdspecialisatieVan ?parentBestuursOrgaan.
-  }
+  ?bestuur ^besluit:bestuurt ?parentBestuursOrgaan.
+  ?bestuursOrgaan generiek:isTijdspecialisatieVan ?parentBestuursOrgaan.
 
   ?bestuursOrgaan mandaat:bindingEinde ?einde.
   FILTER(?einde > now())
@@ -56,10 +50,14 @@ WHERE {
       ?role.
   FILTER(?role IN ( "Voorzitter van het centraal bestuur van de eredienst",  "Voorzitter van het bestuur van de eredienst"))
 
+  ?mandataris org:holds ?post;
+    mandaat:isBestuurlijkeAliasVan ?person .
+
+  ?person foaf:givenName ?firstName ;
+    foaf:familyName ?lastName .
+
   FILTER NOT EXISTS {
     ?mandataris
-      org:holds
-        ?post;
       schema:contactPoint
         ?contactPoint.
   	?contactPoint
@@ -67,6 +65,16 @@ WHERE {
         ?telephone.
     FILTER (strlen(?telephone) > 0)
   }
+
+  {
+    ?mandataris mandaat:einde ?endPosition .
+    FILTER (NOW() < ?endPosition)
+  }
+  UNION
+  {
+    FILTER NOT EXISTS { ?mandataris mandaat:einde ?endPosition . }
+  }
+
 
   OPTIONAL {
     ?bestuur
@@ -91,14 +99,15 @@ WHERE {
       ?primarySite
         organisatie:bestaatUit
           ?sa.
-		    OPTIONAL {
-          ?sa
-            locn:adminUnitL2
-              ?provincie.
-        }
+	    OPTIONAL {
+        ?sa
+          locn:adminUnitL2
+            ?provincie.
       }
     }
-   FILTER (?type IN (
+  }
+
+  FILTER (?type IN (
     <http://data.lblod.info/vocabularies/erediensten/CentraalBestuurVanDeEredienst>,
     <http://data.lblod.info/vocabularies/erediensten/BestuurVanDeEredienst>
   ))

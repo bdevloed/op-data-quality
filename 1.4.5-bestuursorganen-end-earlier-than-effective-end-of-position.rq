@@ -27,21 +27,15 @@ PREFIX code: <http://lblod.data.gift/vocabularies/organisatie/>
 PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
-SELECT DISTINCT ?bestuur ?label ?typeEredienst ?provincie ?bestuursOrgaan ?parentBestuursOrgaan ?role ?einde ?geplandeEinddatumAanstelling
+SELECT DISTINCT ?bestuur ?label ?typeEredienst ?provincie ?bestuursOrgaan ?parentBestuursOrgaan ?role ?einde ?mandatarisEndDate ?mandatarisGeplandeEinddatumAanstelling
 FROM <http://mu.semte.ch/graphs/organisatieportaal>
 WHERE {
   ?bestuur
     a ?type;
     regorg:orgStatus/skos:prefLabel "Actief".
 
-  {
-      ?bestuur ^besluit:bestuurt ?bestuursOrgaan.
-  }
-  UNION
-  {
-      ?bestuur ^besluit:bestuurt ?parentBestuursOrgaan.
-      ?bestuursOrgaan generiek:isTijdspecialisatieVan ?parentBestuursOrgaan.
-  }
+  ?bestuur ^besluit:bestuurt ?parentBestuursOrgaan.
+  ?bestuursOrgaan generiek:isTijdspecialisatieVan ?parentBestuursOrgaan.
 
   ?bestuursOrgaan
     org:hasPost ?post.
@@ -50,12 +44,16 @@ WHERE {
 
   ?mandataris
     org:holds ?post;
-    ere:geplandeEinddatumAanstelling ?geplandeEinddatumAanstelling.
-  
+    ere:geplandeEinddatumAanstelling ?mandatarisGeplandeEinddatumAanstelling.
+
+  OPTIONAL {
+    ?mandataris mandaat:einde ?mandatarisEndDate .
+  }
+
   ?bestuursOrgaan mandaat:bindingEinde ?einde.
   FILTER(?einde > now())
-  
-  FILTER (?einde < ?geplandeEinddatumAanstelling)
+
+  FILTER (?einde < ?mandatarisGeplandeEinddatumAanstelling || ?einde < ?mandatarisEndDate)
 
   OPTIONAL {
     ?bestuur
@@ -80,14 +78,15 @@ WHERE {
       ?primarySite
         organisatie:bestaatUit
           ?sa.
-		    OPTIONAL {
-          ?sa
-            locn:adminUnitL2
-              ?provincie.
-        }
+	    OPTIONAL {
+        ?sa
+          locn:adminUnitL2
+            ?provincie.
       }
     }
-   FILTER (?type IN (
+  }
+
+  FILTER (?type IN (
     <http://data.lblod.info/vocabularies/erediensten/CentraalBestuurVanDeEredienst>,
     <http://data.lblod.info/vocabularies/erediensten/BestuurVanDeEredienst>
   ))

@@ -57,9 +57,10 @@ SELECT DISTINCT * WHERE {
         ?sa
           locn:adminUnitL2
             ?provincie.
-        }
       }
     }
+  }
+
    FILTER (?type IN (
     <http://data.lblod.info/vocabularies/erediensten/CentraalBestuurVanDeEredienst>,
     <http://data.lblod.info/vocabularies/erediensten/BestuurVanDeEredienst>

@@ -31,18 +31,15 @@ SELECT DISTINCT ?bestuur ?label ?typeEredienst ?provincie  WHERE {
       ?type;
     regorg:orgStatus/skos:prefLabel
       "Actief".
+
   FILTER NOT EXISTS {
-    {
-        ?bestuur ^besluit:bestuurt ?bestuursOrgaan.
-    }
-    UNION
-    {
-        ?bestuur ^besluit:bestuurt ?parentBestuursOrgaan.
-        ?bestuursOrgaan generiek:isTijdspecialisatieVan ?parentBestuursOrgaan.
-    }
+    ?bestuur ^besluit:bestuurt ?parentBestuursOrgaan.
+    ?bestuursOrgaan generiek:isTijdspecialisatieVan ?parentBestuursOrgaan.
+
     ?bestuursOrgaan mandaat:bindingEinde ?einde.
     FILTER(?einde > now())
   }
+
   OPTIONAL {
     ?bestuur
       skos:prefLabel
@@ -93,7 +90,8 @@ SELECT DISTINCT ?bestuur ?label ?typeEredienst ?provincie  WHERE {
         }
       }
     }
-   FILTER (?type IN (
+
+  FILTER (?type IN (
     <http://data.lblod.info/vocabularies/erediensten/CentraalBestuurVanDeEredienst>,
     <http://data.lblod.info/vocabularies/erediensten/BestuurVanDeEredienst>
   ))

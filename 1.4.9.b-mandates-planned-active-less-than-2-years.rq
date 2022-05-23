@@ -27,7 +27,7 @@ PREFIX code: <http://lblod.data.gift/vocabularies/organisatie/>
 PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
-SELECT DISTINCT ?bestuur ?label ?typeEredienst ?provincie ?bestuursOrgaan ?parentBestuursOrgaan ?role ?einde ?geplandeEinddatumAanstelling ?years
+SELECT DISTINCT ?bestuur ?label ?typeEredienst ?provincie ?bestuursOrgaan ?parentBestuursOrgaan ?role ?start ?geplandeEinddatumAanstelling ?years
 FROM <http://mu.semte.ch/graphs/organisatieportaal>
 WHERE {
   ?bestuur
@@ -36,14 +36,8 @@ WHERE {
     regorg:orgStatus/skos:prefLabel
       "Actief".
 
-  {
-      ?bestuur ^besluit:bestuurt ?bestuursOrgaan.
-  }
-  UNION
-  {
-      ?bestuur ^besluit:bestuurt ?parentBestuursOrgaan.
-      ?bestuursOrgaan generiek:isTijdspecialisatieVan ?parentBestuursOrgaan.
-  }
+  ?bestuur ^besluit:bestuurt ?parentBestuursOrgaan.
+  ?bestuursOrgaan generiek:isTijdspecialisatieVan ?parentBestuursOrgaan.
 
   ?bestuursOrgaan
     org:hasPost
@@ -54,24 +48,28 @@ WHERE {
 
   ?mandataris
     	org:holds ?post;
-   		mandaat:einde ?einde;
+   		mandaat:start ?start;
       ere:geplandeEinddatumAanstelling ?geplandeEinddatumAanstelling.
-  
+
+  OPTIONAL {
+    ?mandataris mandaat:einde ?mandatarisEinde.
+  }
+
   ?bestuursOrgaan mandaat:bindingEinde ?einde.
+
   FILTER(?einde > now())
-  
-  BIND( 
-  year(?einde) - year(?geplandeEinddatumAanstelling) 
-  - if(
-      month(?einde) < month(?geplandeEinddatumAanstelling) || 
-      ( 
-        month(?einde) = month(?geplandeEinddatumAanstelling) &&
-        day(?einde) < day(?geplandeEinddatumAanstelling)
-      )
-    ,1,0 ) 
+  FILTER(?mandatarisEinde > now())
+
+  FILTER(?start != "1900-01-01"^^xsd:date)
+  FILTER(?mandatarisEinde != "1900-01-01"^^xsd:date)
+
+  BIND (
+    (xsd:decimal(year(?geplandeEinddatumAanstelling)) + xsd:decimal(month(?geplandeEinddatumAanstelling))/10)
+    -
+    (xsd:decimal(year(?start)) + xsd:decimal(month(?start))/10)
   as ?years )
   
-  FILTER (?years > 3)
+  FILTER (?years < 2)
 
   OPTIONAL {
     ?bestuur
@@ -96,14 +94,15 @@ WHERE {
       ?primarySite
         organisatie:bestaatUit
           ?sa.
-		    OPTIONAL {
-          ?sa
-            locn:adminUnitL2
-              ?provincie.
-        }
+	    OPTIONAL {
+        ?sa
+          locn:adminUnitL2
+            ?provincie.
       }
     }
-   FILTER (?type IN (
+  }
+
+  FILTER (?type IN (
     <http://data.lblod.info/vocabularies/erediensten/CentraalBestuurVanDeEredienst>,
     <http://data.lblod.info/vocabularies/erediensten/BestuurVanDeEredienst>
   ))

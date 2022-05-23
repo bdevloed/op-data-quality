@@ -36,14 +36,8 @@ WHERE {
     regorg:orgStatus/skos:prefLabel
       "Actief".
 
-  {
-      ?bestuur ^besluit:bestuurt ?bestuursOrgaan.
-  }
-  UNION
-  {
-      ?bestuur ^besluit:bestuurt ?parentBestuursOrgaan.
-      ?bestuursOrgaan generiek:isTijdspecialisatieVan ?parentBestuursOrgaan.
-  }
+  ?bestuur ^besluit:bestuurt ?parentBestuursOrgaan.
+  ?bestuursOrgaan generiek:isTijdspecialisatieVan ?parentBestuursOrgaan.
 
   ?bestuursOrgaan mandaat:bindingEinde ?einde.
   FILTER(?einde > now())
@@ -75,15 +69,15 @@ WHERE {
       ?primarySite
         organisatie:bestaatUit
           ?sa.
-		    OPTIONAL {
-          ?sa
-            locn:adminUnitL2
-              ?provincie.
-        }
+	    OPTIONAL {
+        ?sa
+          locn:adminUnitL2
+            ?provincie.
       }
     }
-   FILTER (?type IN (
-    <http://data.lblod.info/vocabularies/erediensten/CentraalBestuurVanDeEredienst>,
+  }
+
+  FILTER (?type IN (
     <http://data.lblod.info/vocabularies/erediensten/BestuurVanDeEredienst>
   ))
 }

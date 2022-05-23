@@ -27,7 +27,7 @@ PREFIX code: <http://lblod.data.gift/vocabularies/organisatie/>
 PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
-SELECT DISTINCT ?bestuur ?label ?typeEredienst ?provincie ?bestuursOrgaan ?parentBestuursOrgaan ?typePositie
+SELECT DISTINCT ?bestuur ?label ?typeEredienst ?provincie ?bestuursOrgaan ?parentBestuursOrgaan ?typePositie ?firstName ?lastName
 FROM <http://mu.semte.ch/graphs/organisatieportaal>
 WHERE {
   ?bestuur
@@ -49,7 +49,10 @@ WHERE {
   FILTER(?einde > now())
 
   ?bestuur ere:wordtBediendDoor ?ministerPosition .
-  ?minister org:holds ?ministerPosition .
+  ?minister org:holds ?ministerPosition ;
+    org:heldBy ?person.
+  ?person foaf:givenName ?firstName ;
+    foaf:familyName ?lastName .
   ?ministerPostition ere:functie/skos:prefLabel ?typePositie .
 
   FILTER NOT EXISTS {
@@ -81,14 +84,15 @@ WHERE {
       ?primarySite
         organisatie:bestaatUit
           ?sa.
-		    OPTIONAL {
-          ?sa
-            locn:adminUnitL2
-              ?provincie.
-        }
+	    OPTIONAL {
+        ?sa
+          locn:adminUnitL2
+            ?provincie.
       }
     }
-   FILTER (?type IN (
+  }
+
+  FILTER (?type IN (
     <http://data.lblod.info/vocabularies/erediensten/CentraalBestuurVanDeEredienst>,
     <http://data.lblod.info/vocabularies/erediensten/BestuurVanDeEredienst>
   ))

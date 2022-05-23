@@ -27,32 +27,45 @@ PREFIX code: <http://lblod.data.gift/vocabularies/organisatie/>
 PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
-SELECT DISTINCT ?bestuur ?label ?typeEredienst ?provincie ?bestuursOrgaan ?parentBestuursOrgaan ?role ?start ?startPosition
+SELECT DISTINCT ?bestuur ?label ?typeEredienst ?provincie ?bestuursOrgaan ?parentBestuursOrgaan ?role ?start ?mandatarisEinde ?years
 FROM <http://mu.semte.ch/graphs/organisatieportaal>
 WHERE {
   ?bestuur
-    a ?type;
-    regorg:orgStatus/skos:prefLabel "Actief".
+    a
+      ?type;
+    regorg:orgStatus/skos:prefLabel
+      "Actief".
 
   ?bestuur ^besluit:bestuurt ?parentBestuursOrgaan.
   ?bestuursOrgaan generiek:isTijdspecialisatieVan ?parentBestuursOrgaan.
 
   ?bestuursOrgaan
-    org:hasPost ?post.
+    org:hasPost
+      ?post.
   ?post
-    org:role/skos:prefLabel ?role.
+    org:role/skos:prefLabel
+      ?role.
 
   ?mandataris
-    org:holds ?post;
-    mandaat:start ?startPosition.
+    	org:holds ?post;
+   		mandaat:start ?start;
+   		mandaat:einde ?mandatarisEinde.
   
-  ?bestuursOrgaan
-    mandaat:bindingStart ?start;
-    mandaat:bindingEinde ?einde.
+  ?bestuursOrgaan mandaat:bindingEinde ?einde.
 
   FILTER(?einde > now())
-  FILTER (?start > ?startPosition)
-  FILTER(?startPosition != "1900-01-01"^^xsd:date)
+  FILTER(?mandatarisEinde > now())
+
+  FILTER(?start != "1900-01-01"^^xsd:date)
+  FILTER(?mandatarisEinde != "1900-01-01"^^xsd:date)
+  
+  BIND (
+    (xsd:decimal(year(?mandatarisEinde)) + xsd:decimal(month(?mandatarisEinde))/10)
+    -
+    (xsd:decimal(year(?start)) + xsd:decimal(month(?start))/10)
+  as ?years )
+  
+  FILTER (?years < 2)
 
   OPTIONAL {
     ?bestuur

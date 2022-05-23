@@ -49,8 +49,8 @@ WHERE {
   FILTER(?einde > now())
 
   FILTER NOT EXISTS {
-    ?bestuursOrgaan org:hasPost/org:role/skos:prefLabel ?voozitter.
-    FILTER(?voorzitter IN ( "Voorzitter van het centraal bestuur van de eredienst",  "Voorzitter van het bestuur van de eredienst"))
+    ?bestuursOrgaan org:hasPost/org:role/skos:prefLabel ?voorzitter.
+    FILTER(?voorzitter IN ( "Voorzitter van het centraal bestuur van de eredienst", "Voorzitter van het bestuur van de eredienst"))
   }
 
   OPTIONAL {
@@ -76,14 +76,15 @@ WHERE {
       ?primarySite
         organisatie:bestaatUit
           ?sa.
-		    OPTIONAL {
-          ?sa
-            locn:adminUnitL2
-              ?provincie.
-        }
+	    OPTIONAL {
+        ?sa
+          locn:adminUnitL2
+            ?provincie.
       }
     }
-   FILTER (?type IN (
+  }
+
+  FILTER (?type IN (
     <http://data.lblod.info/vocabularies/erediensten/CentraalBestuurVanDeEredienst>,
     <http://data.lblod.info/vocabularies/erediensten/BestuurVanDeEredienst>
   ))

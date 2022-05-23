@@ -31,14 +31,11 @@ WHERE {
   ?bestuur a ?type;
     regorg:orgStatus/skos:prefLabel ?bestuurStatus.
 
-  {
-      ?bestuur ^besluit:bestuurt ?bestuursOrgaan.
-  }
-  UNION
-  {
-      ?bestuur ^besluit:bestuurt ?parentBestuursOrgaan.
-      ?bestuursOrgaan generiek:isTijdspecialisatieVan ?parentBestuursOrgaan.
-  }
+  ?bestuur ^besluit:bestuurt ?parentBestuursOrgaan.
+  ?bestuursOrgaan generiek:isTijdspecialisatieVan ?parentBestuursOrgaan ;
+    mandaat:bindingEinde ?einde.
+
+  FILTER(?einde > now())
 
   FILTER NOT EXISTS {
     ?bestuursOrgaan ere:wordtBediendDoor ?position .
@@ -47,7 +44,6 @@ WHERE {
   FILTER NOT EXISTS {
     ?bestuursOrgaan org:hasPost ?mandate .
   }
-
    
   OPTIONAL {
     ?bestuur
@@ -72,14 +68,15 @@ WHERE {
       ?primarySite
         organisatie:bestaatUit
           ?sa.
-		    OPTIONAL {
-          ?sa
-            locn:adminUnitL2
-              ?provincie.
-        }
+	    OPTIONAL {
+        ?sa
+          locn:adminUnitL2
+            ?provincie.
       }
     }
-   FILTER (?type IN (
+  }
+
+  FILTER (?type IN (
     <http://data.lblod.info/vocabularies/erediensten/CentraalBestuurVanDeEredienst>,
     <http://data.lblod.info/vocabularies/erediensten/BestuurVanDeEredienst>
   ))

@@ -5,13 +5,23 @@ PREFIX mandaat: <http://data.vlaanderen.be/ns/mandaat#>
 PREFIX ch: <http://data.lblod.info/vocabularies/contacthub/>
 PREFIX ere: <http://data.lblod.info/vocabularies/erediensten/>
 
-SELECT DISTINCT ?person ?firstName ?lastName ?endPosition
+SELECT DISTINCT ?person ?firstName ?lastName
 FROM <http://mu.semte.ch/graphs/organisatieportaal>
 WHERE {
   ?person a person:Person ;
     foaf:givenName ?firstName ;
-    foaf:familyName ?lastName .
+    foaf:familyName ?lastName ;
+    (^org:heldBy)|(^mandaat:isBestuurlijkeAliasVan) ?position .
 
-  ?person (^org:heldBy/ch:eindedatum)|(^mandaat:isBestuurlijkeAliasVan/ere:geplandeEinddatumAanstelling) ?endPosition .
-  FILTER (NOW() > ?endPosition)
+  FILTER NOT EXISTS {
+    {
+      ?person (^org:heldBy/ch:eindedatum)|(^mandaat:isBestuurlijkeAliasVan/mandaat:einde) ?endPosition .
+      FILTER (NOW() < ?endPosition)
+    }
+    UNION
+    {
+      ?person (^org:heldBy)|(^mandaat:isBestuurlijkeAliasVan) ?position.
+      FILTER NOT EXISTS { ?position ch:eindedatum|mandaat:einde ?endPosition . }
+    }
+  }
 }

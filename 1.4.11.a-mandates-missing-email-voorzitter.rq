@@ -54,12 +54,19 @@ WHERE {
   ?post
     org:role/skos:prefLabel
       ?role.
+
   FILTER(?role IN ( "Voorzitter van het centraal bestuur van de eredienst",  "Voorzitter van het bestuur van de eredienst"))
+
+  ?mandataris org:holds ?post .
+
+  OPTIONAL {
+    ?mandataris mandaat:einde ?endPosition .
+  }
+
+  FILTER (!bound(?endPosition) || ?endPosition > NOW())
 
   FILTER NOT EXISTS {
     ?mandataris
-      org:holds
-        ?post;
       schema:contactPoint
         ?contactPoint.
   	?contactPoint
@@ -91,14 +98,15 @@ WHERE {
       ?primarySite
         organisatie:bestaatUit
           ?sa.
-		    OPTIONAL {
-          ?sa
-            locn:adminUnitL2
-              ?provincie.
-        }
+	    OPTIONAL {
+        ?sa
+          locn:adminUnitL2
+            ?provincie.
       }
     }
-   FILTER (?type IN (
+  }
+
+  FILTER (?type IN (
     <http://data.lblod.info/vocabularies/erediensten/CentraalBestuurVanDeEredienst>,
     <http://data.lblod.info/vocabularies/erediensten/BestuurVanDeEredienst>
   ))

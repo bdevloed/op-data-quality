@@ -32,6 +32,7 @@ SELECT DISTINCT ?bestuur ?label ?typeEredienst ?provincie ?betrokkenheidCount WH
       ?bestuur
         a
           ?type.
+
       FILTER (?type IN (
         <http://data.lblod.info/vocabularies/erediensten/CentraalBestuurVanDeEredienst>,
         <http://data.lblod.info/vocabularies/erediensten/BestuurVanDeEredienst>

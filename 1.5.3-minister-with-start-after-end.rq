@@ -55,7 +55,7 @@ WHERE {
     org:heldBy ?person.
   ?person foaf:givenName ?firstName ;
     foaf:familyName ?lastName .
-  ?ministerPostition ere:functie/skos:prefLabel ?typePositie .
+  ?ministerPosition ere:functie/skos:prefLabel ?typePositie .
 
   FILTER (?startMinister > ?endMinister)
 

@@ -25,57 +25,48 @@ PREFIX code: <http://lblod.data.gift/vocabularies/organisatie/>
 PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
-SELECT * 
+SELECT ?label ?bestuur1 ?bestuur2 ?typeEredienst1 ?typeEredienst2 ?provincie
 FROM <http://mu.semte.ch/graphs/organisatieportaal>
 WHERE {
-  ?bestuur
-    a
-      ?type;
-    regorg:orgStatus/skos:prefLabel
-      "Actief".
-  OPTIONAL {
-    ?bestuur
-      skos:prefLabel
-        ?label
+  VALUES ?type {
+    <http://data.lblod.info/vocabularies/erediensten/CentraalBestuurVanDeEredienst>
+    <http://data.lblod.info/vocabularies/erediensten/BestuurVanDeEredienst>
   }
+
+  ?bestuur1 a ?type ;
+    skos:prefLabel ?label .
+
   OPTIONAL {
-  	?bestuur
-    	ere:typeEredienst
-      		?typeEredienstUri.
+  	?bestuur1 ere:typeEredienst ?typeEredienstUri.
+
     OPTIONAL {
-    	?typeEredienstUri
-        	skos:prefLabel
-          	?typeEredienst.
-	}
+    	?typeEredienstUri skos:prefLabel ?typeEredienst1.
+	  }
   }
+
   OPTIONAL {
-    ?bestuur
-      org:hasPrimarySite
-        ?primarySite.
+    ?bestuur1 org:hasPrimarySite ?primarySite.
+
     OPTIONAL {    
-      ?primarySite
-        organisatie:bestaatUit
-          ?sa.
+      ?primarySite organisatie:bestaatUit ?sa.
+
 		  OPTIONAL {
-        ?sa
-          locn:adminUnitL2
-            ?provincie.
+        ?sa locn:adminUnitL2 ?provincie.
       }
     }
   }
-
-  FILTER (?type IN (
-    <http://data.lblod.info/vocabularies/erediensten/CentraalBestuurVanDeEredienst>,
-    <http://data.lblod.info/vocabularies/erediensten/BestuurVanDeEredienst>
-  ))
   
-  ?bestuur2
-    ere:typeEredienst
-      		?typeEredienstUri2;
-    skos:prefLabel
-      ?label2.
+  ?bestuur2 skos:prefLabel ?label.
+
+  OPTIONAL {
+  	?bestuur2 ere:typeEredienst ?typeEredienstUri2.
+
+    OPTIONAL {
+    	?typeEredienstUri2 skos:prefLabel ?typeEredienst2.
+	  }
+  }
+
   FILTER (
-    lcase(?label) = lcase(?label2) &&
-    ?bestuur != ?bestuur2
+    ?bestuur1 > ?bestuur2
   )
 }

@@ -38,7 +38,8 @@ SELECT DISTINCT ?bestuur ?label ?typeEredienst ?provincie ?bestuursOrgaan ?paren
 
   FILTER NOT EXISTS {
     ?bestuursOrgaan mandaat:bindingEinde ?einde.
-  }    
+  }
+
   OPTIONAL {
     ?bestuur
       skos:prefLabel

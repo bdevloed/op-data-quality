@@ -30,64 +30,43 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 SELECT DISTINCT ?bestuur ?label ?typeEredienst ?provincie ?bestuursOrgaan ?parentBestuursOrgaan ?memberCount 
 FROM <http://mu.semte.ch/graphs/organisatieportaal>
 WHERE {
-  ?bestuur
-    a
-      ?type;
-    regorg:orgStatus/skos:prefLabel
-      "Actief".
+  ?bestuur a ?type;
+    regorg:orgStatus/skos:prefLabel "Actief".
+
+  ?parentBestuursOrgaan besluit:bestuurt ?bestuur .
+  ?bestuursOrgaan generiek:isTijdspecialisatieVan ?parentBestuursOrgaan .
 
   {
-      ?bestuur ^besluit:bestuurt ?bestuursOrgaan.
-  }
-  UNION
-  {
-      ?bestuur ^besluit:bestuurt ?parentBestuursOrgaan.
-      ?bestuursOrgaan generiek:isTijdspecialisatieVan ?parentBestuursOrgaan.
-  }
-
-  {
-    SELECT ?bestuursOrgaan (COUNT(DISTINCT ?member ) AS ?memberCount)
+    SELECT ?bestuursOrgaan (COUNT(DISTINCT ?mandataris ) AS ?memberCount)
     WHERE {
         ?bestuursOrgaan org:hasPost ?post.
         ?mandataris
-          org:holds ?post ;
-          mandaat:einde ?einde ;
-          mandaat:isBestuurlijkeAliasVan ?member.
+          org:holds ?post .
 
-          FILTER(?einde > now())
+        OPTIONAL { ?mandataris mandaat:einde ?einde . }
+
+        FILTER(!BOUND(?einde) || ?einde > now())
     }
     GROUP BY ?bestuursOrgaan
-    HAVING (COUNT(DISTINCT ?member) > 6)
+    HAVING (COUNT(DISTINCT ?mandataris) > 6)
     ORDER BY ?bestuursOrgaan
   }
 
   OPTIONAL {
-    ?bestuur
-      skos:prefLabel
-        ?label
+    ?bestuur skos:prefLabel ?label
   }
   OPTIONAL {
-  	?bestuur
-    	ere:typeEredienst
-      		?typeEredienstUri.
+  	?bestuur ere:typeEredienst ?typeEredienstUri.
     OPTIONAL {
-    	?typeEredienstUri
-        	skos:prefLabel
-          	?typeEredienst.
+    	?typeEredienstUri skos:prefLabel ?typeEredienst.
 	  }
   }
   OPTIONAL {
-    ?bestuur
-      org:hasPrimarySite
-        ?primarySite.
+    ?bestuur org:hasPrimarySite ?primarySite.
     OPTIONAL {    
-      ?primarySite
-        organisatie:bestaatUit
-          ?sa.
+      ?primarySite organisatie:bestaatUit ?sa.
 	    OPTIONAL {
-        ?sa
-          locn:adminUnitL2
-            ?provincie.
+        ?sa locn:adminUnitL2 ?provincie.
       }
     }
   }

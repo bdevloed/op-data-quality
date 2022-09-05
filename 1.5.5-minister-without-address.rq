@@ -53,7 +53,7 @@ WHERE {
     org:heldBy ?person.
   ?person foaf:givenName ?firstName ;
     foaf:familyName ?lastName .
-  ?ministerPostition ere:functie/skos:prefLabel ?typePositie .
+  ?ministerPosition ere:functie/skos:prefLabel ?typePositie .
 
   FILTER NOT EXISTS {
     ?minister schema:contactPoint ?contactPoint.

@@ -1,3 +1,5 @@
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+	
 PREFIX org: <http://www.w3.org/ns/org#>
 PREFIX locn: <http://www.w3.org/ns/locn#>
 PREFIX schema: <http://schema.org/>
@@ -25,41 +27,46 @@ PREFIX code: <http://lblod.data.gift/vocabularies/organisatie/>
 PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
-SELECT * 
+SELECT DISTINCT ?bestuur ?label ?typeEredienst ?provincie ?bestuursOrgaan ?parentBestuursOrgaan ?memberCount 
 FROM <http://mu.semte.ch/graphs/organisatieportaal>
 WHERE {
-  ?bestuur
-    a
-      ?type;
-    regorg:orgStatus/skos:prefLabel
-      "Actief".
+  ?bestuur a ?type;
+    regorg:orgStatus/skos:prefLabel "Actief".
+
+  ?parentBestuursOrgaan besluit:bestuurt ?bestuur .
+  ?bestuursOrgaan generiek:isTijdspecialisatieVan ?parentBestuursOrgaan .
+
+  {
+    SELECT ?bestuursOrgaan (COUNT(DISTINCT ?mandataris ) AS ?memberCount)
+    WHERE {
+        ?bestuursOrgaan org:hasPost ?post.
+        ?mandataris
+          org:holds ?post .
+
+        OPTIONAL { ?mandataris mandaat:einde ?einde . }
+
+        FILTER(!BOUND(?einde) || ?einde > now())
+    }
+    GROUP BY ?bestuursOrgaan
+    HAVING (COUNT(DISTINCT ?mandataris) > 6)
+    ORDER BY ?bestuursOrgaan
+  }
+
   OPTIONAL {
-    ?bestuur
-      skos:prefLabel
-        ?label
+    ?bestuur skos:prefLabel ?label
   }
   OPTIONAL {
-  	?bestuur
-    	ere:typeEredienst
-      		?typeEredienstUri.
+  	?bestuur ere:typeEredienst ?typeEredienstUri.
     OPTIONAL {
-    	?typeEredienstUri
-        	skos:prefLabel
-          	?typeEredienst.
-	}
+    	?typeEredienstUri skos:prefLabel ?typeEredienst.
+	  }
   }
   OPTIONAL {
-    ?bestuur
-      org:hasPrimarySite
-        ?primarySite.
+    ?bestuur org:hasPrimarySite ?primarySite.
     OPTIONAL {    
-      ?primarySite
-        organisatie:bestaatUit
-          ?sa.
-		  OPTIONAL {
-        ?sa
-          locn:adminUnitL2
-            ?provincie.
+      ?primarySite organisatie:bestaatUit ?sa.
+	    OPTIONAL {
+        ?sa locn:adminUnitL2 ?provincie.
       }
     }
   }
@@ -68,14 +75,4 @@ WHERE {
     <http://data.lblod.info/vocabularies/erediensten/CentraalBestuurVanDeEredienst>,
     <http://data.lblod.info/vocabularies/erediensten/BestuurVanDeEredienst>
   ))
-  
-  ?bestuur2
-    ere:typeEredienst
-      		?typeEredienstUri2;
-    skos:prefLabel
-      ?label2.
-  FILTER (
-    lcase(?label) = lcase(?label2) &&
-    ?bestuur != ?bestuur2
-  )
 }

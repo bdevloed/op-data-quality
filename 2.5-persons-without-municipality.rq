@@ -5,6 +5,7 @@ PREFIX mandaat: <http://data.vlaanderen.be/ns/mandaat#>
 PREFIX locn: <http://www.w3.org/ns/locn#>
 PREFIX schema: <http://schema.org/>
 PREFIX adres: <https://data.vlaanderen.be/ns/adres#>
+PREFIX ch: <http://data.lblod.info/vocabularies/contacthub/>
 
 SELECT DISTINCT ?person ?firstName ?lastName ?position
 FROM <http://mu.semte.ch/graphs/organisatieportaal>
@@ -14,6 +15,10 @@ WHERE {
     foaf:familyName ?lastName .
 
   ?position org:heldBy|mandaat:isBestuurlijkeAliasVan ?person .
+
+  OPTIONAL { ?position ch:eindedatum|mandaat:einde ?endPosition . }
+
+  FILTER(!BOUND(?endPosition) || ?endPosition > now())
 
   FILTER NOT EXISTS {
     ?position schema:contactPoint ?contactPoint .

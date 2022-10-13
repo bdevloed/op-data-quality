@@ -27,7 +27,14 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
 
 SELECT DISTINCT * WHERE {
-  ?bestuur a <http://data.lblod.info/vocabularies/erediensten/BestuurVanDeEredienst>.
+  ?bestuur a <http://data.lblod.info/vocabularies/erediensten/BestuurVanDeEredienst>;
+    regorg:orgStatus/skos:prefLabel
+      ?status.
+
+  VALUES ?status {
+    "Actief"
+    "In oprichting"
+  }
 
   OPTIONAL {
     ?bestuur

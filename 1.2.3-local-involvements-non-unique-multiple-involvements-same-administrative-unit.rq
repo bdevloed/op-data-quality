@@ -20,7 +20,7 @@ PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX euvoc: <http://publications.europa.eu/ontology/euvoc#>
 PREFIX ere: <http://data.lblod.info/vocabularies/erediensten/>
-PREFIX ch: <http://data.lblod.info/vocabularies/contacthub/>    
+PREFIX ch: <http://data.lblod.info/vocabularies/contacthub/>
 PREFIX code: <http://lblod.data.gift/vocabularies/organisatie/>
 PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -43,8 +43,8 @@ SELECT DISTINCT ?bestuur ?label ?typeEredienst ?provincie ?betrokkenheidCount ?l
            ?bestuur;
          a
            ere:BetrokkenLokaleBesturen.
-       ?lokaalBestuur
-         ere:betrokkenBestuur
+      ?lokaalBestuur
+        ere:betrokkenBestuur
           ?betrokkenheid.
     }
     GROUP BY ?bestuur ?lokaalBestuur
@@ -57,24 +57,24 @@ SELECT DISTINCT ?bestuur ?label ?typeEredienst ?provincie ?betrokkenheidCount ?l
         ?label
   }
   OPTIONAL {
-  	?bestuur
-    	ere:typeEredienst
-     		?typeEredienstUri.
+    ?bestuur
+      ere:typeEredienst
+         ?typeEredienstUri.
     OPTIONAL {
-    	?typeEredienstUri
-       	skos:prefLabel
-        	?typeEredienst.
-	  }
+      ?typeEredienstUri
+        skos:prefLabel
+          ?typeEredienst.
+    }
   }
   OPTIONAL {
     ?bestuur
       org:hasPrimarySite
         ?primarySite.
-	  OPTIONAL {    
+    OPTIONAL {
       ?primarySite
         organisatie:bestaatUit
           ?sa.
-		  OPTIONAL {
+      OPTIONAL {
         ?sa
           locn:adminUnitL2
             ?provincie.
@@ -83,7 +83,7 @@ SELECT DISTINCT ?bestuur ?label ?typeEredienst ?provincie ?betrokkenheidCount ?l
     }
     OPTIONAL {
       ?lokaalBestuur
-      	skos:prefLabel
-        	?lokaalBestuurLabel
+        skos:prefLabel
+          ?lokaalBestuurLabel
   }
 }

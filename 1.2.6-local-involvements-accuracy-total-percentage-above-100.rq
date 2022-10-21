@@ -20,7 +20,7 @@ PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX euvoc: <http://publications.europa.eu/ontology/euvoc#>
 PREFIX ere: <http://data.lblod.info/vocabularies/erediensten/>
-PREFIX ch: <http://data.lblod.info/vocabularies/contacthub/>    
+PREFIX ch: <http://data.lblod.info/vocabularies/contacthub/>
 PREFIX code: <http://lblod.data.gift/vocabularies/organisatie/>
 PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -37,16 +37,16 @@ SELECT DISTINCT ?bestuur ?label ?typeEredienst ?provincie ?financieringspercenta
         <http://data.lblod.info/vocabularies/erediensten/CentraalBestuurVanDeEredienst>,
         <http://data.lblod.info/vocabularies/erediensten/BestuurVanDeEredienst>
       ))
-      
+
       ?betrokkenheid
         org:organization
           ?bestuur;
         ere:financieringspercentage
           ?financieringspercentage;
-        a 
+        a
           ere:BetrokkenLokaleBesturen;
         ere:typebetrokkenheid/skos:prefLabel
-          "Toezichthoudend en financierend".
+          "Toezichthoudend".
     }
     GROUP BY ?bestuur
     HAVING(SUM(?financieringspercentage) > 100)
@@ -71,7 +71,7 @@ SELECT DISTINCT ?bestuur ?label ?typeEredienst ?provincie ?financieringspercenta
     ?bestuur
       org:hasPrimarySite
         ?primarySite.
-	  OPTIONAL {    
+	  OPTIONAL {
       ?primarySite
         organisatie:bestaatUit
           ?sa.

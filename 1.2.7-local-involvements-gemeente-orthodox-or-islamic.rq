@@ -24,56 +24,76 @@ PREFIX ch: <http://data.lblod.info/vocabularies/contacthub/>
 PREFIX code: <http://lblod.data.gift/vocabularies/organisatie/>
 PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
 
-SELECT DISTINCT ?bestuur ?label ?typeEredienst ?provincie ?betrokkenheidCount WHERE {
-  {
-    SELECT ?bestuur (COUNT(DISTINCT ?betrokkenheid) as ?betrokkenheidCount) WHERE {
-      ?bestuur
-        a
-          ?type.
+SELECT DISTINCT ?bestuur ?label ?typeEredienst ?lokaalBestuurLabel ?lokaalBestuursType ?provincie ?betrokkenheidsType ?financieringspercentage
+WHERE {
+  ?bestuur
+    a
+      ?type;
+    ere:typeEredienst/skos:prefLabel
+      ?typeEredienst.
 
-      FILTER (?type IN (
-        <http://data.lblod.info/vocabularies/erediensten/CentraalBestuurVanDeEredienst>,
-        <http://data.lblod.info/vocabularies/erediensten/BestuurVanDeEredienst>
-      ))
+  FILTER (?type IN (
+    <http://data.lblod.info/vocabularies/erediensten/CentraalBestuurVanDeEredienst>,
+    <http://data.lblod.info/vocabularies/erediensten/BestuurVanDeEredienst>
+  ))
 
-       ?betrokkenheid
-          org:organization
-            ?bestuur;
-          ere:typebetrokkenheid/skos:prefLabel
-            "Toezichthoudend";
-          a
-            ere:BetrokkenLokaleBesturen.
-    }
-    GROUP BY ?bestuur
-    HAVING(COUNT(DISTINCT ?betrokkenheid) > 1)
-    ORDER BY DESC(?betrokkenheidCount)
+  VALUES ?typeEredienst {
+      "Orthodox"
+      "Islamitisch"
   }
+
+  VALUES ?lokaalBestuursType {
+    "Gemeente"
+  }
+
+  VALUES ?betrokkenheidsType {
+    "Toezichthoudend"
+  }
+
+  ?betrokkenheid
+    org:organization
+      ?bestuur;
+    a
+      ere:BetrokkenLokaleBesturen;
+    ere:typebetrokkenheid/skos:prefLabel
+      ?betrokkenheidsType.
+
+  OPTIONAL {
+    ?betrokkenheid
+      ere:financieringspercentage
+        ?financieringspercentage.
+  }
+
+  ?lokaalBestuur
+    ere:betrokkenBestuur
+      ?betrokkenheid;
+    org:classification/skos:prefLabel
+      ?lokaalBestuursType.
+
+  OPTIONAL {
+    ?lokaalBestuur
+      skos:prefLabel
+        ?lokaalBestuurLabel
+  }
+
   OPTIONAL {
     ?bestuur
       skos:prefLabel
         ?label
   }
-  OPTIONAL {
-  	?bestuur
-    	ere:typeEredienst
-     		?typeEredienstUri.
-    OPTIONAL {
-    	?typeEredienstUri
-       	skos:prefLabel
-        	?typeEredienst.
-	  }
-  }
+
   OPTIONAL {
     ?bestuur
       org:hasPrimarySite
         ?primarySite.
-	  OPTIONAL {
+    OPTIONAL {
       ?primarySite
         organisatie:bestaatUit
           ?sa.
-		  OPTIONAL {
+      OPTIONAL {
         ?sa
           locn:adminUnitL2
             ?provincie.
@@ -81,4 +101,3 @@ SELECT DISTINCT ?bestuur ?label ?typeEredienst ?provincie ?betrokkenheidCount WH
       }
     }
 }
-

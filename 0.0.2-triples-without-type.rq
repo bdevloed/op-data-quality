@@ -1,0 +1,11 @@
+SELECT DISTINCT ?g ?p (COUNT(?s) as ?numberTriplesWithoutType) WHERE {
+  GRAPH ?g {
+    ?s
+      ?p
+        ?o.
+    FILTER NOT EXISTS {?s a ?type}
+  }
+FILTER(?g NOT IN (<http://www.openlinksw.com/schemas/virtrdf#>, <http://www.w3.org/2002/07/owl#>, <http://localhost:8890/sparql>, <http://mu.semte.ch/graphs/system/jobs>))
+}
+GROUP BY ?g ?p
+ORDER BY ?g ?p
